@@ -1,0 +1,375 @@
+/* ================= GLOBAL RESET ================= */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  background-color: #f9fafb;
+}
+
+/* ================= LANDING PAGE ================= */
+
+.landingPageContainer {
+  width: 100vw;
+  height: 100vh;
+  background:
+    linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)),
+    url("/public/background.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  color: white;
+}
+
+/* NAVBAR */
+.landingPageContainer nav {
+  padding: 24px 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.landingPageContainer nav h2 {
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.navlist {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+
+.navlist p {
+  cursor: pointer;
+  opacity: 0.85;
+  transition: opacity 0.2s ease;
+}
+
+.navlist p:hover {
+  opacity: 1;
+}
+
+/* HERO SECTION */
+.landingMainContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 64px;
+  height: calc(100vh - 90px);
+}
+
+.landingMainContainer div[role='button'] {
+  margin-top: 32px;
+  background: #FF9839;
+  padding: 14px 28px;
+  border-radius: 999px;
+  width: fit-content;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.landingMainContainer div[role='button']:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+}
+
+.landingMainContainer div[role='button'] a {
+  text-decoration: none;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+
+.landingMainContainer h1 {
+  font-size: 3rem;
+  line-height: 1.2;
+}
+
+.landingMainContainer p {
+  margin-top: 16px;
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+/* CTA BUTTON */
+.landingMainContainer div[role='button'] {
+  margin-top: 32px;
+  background: #ff9839;
+  padding: 14px 28px;
+  border-radius: 999px;
+  width: fit-content;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.landingMainContainer div[role='button']:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+}
+
+.landingMainContainer div[role='button'] a {
+  color: white;
+  text-decoration: none;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+/* HERO IMAGE */
+.landingMainContainer img {
+  height: 70vh;
+  border-radius: 24px;
+}
+
+/* ================= HOME PAGE ================= */
+
+.navBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px;
+  background: white;
+  box-shadow: 0 1px 10px rgba(0,0,0,0.05);
+}
+
+.meetContainer {
+  display: flex;
+  max-width: 1200px;
+  margin: auto;
+  padding: 40px 20px;
+  gap: 80px;
+  align-items: center;
+}
+
+.leftPanel {
+  flex: 1;
+}
+
+.rightPanel {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.rightPanel img {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 24px;
+}
+
+/* ================= AUTH PAGE FIX ================= */
+
+/* LEFT IMAGE */
+.authImage {
+  background-image:
+    linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.85)),
+    url("https://images.unsplash.com/photo-1522071820081-009f0129c71c");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+}
+
+/* RIGHT SIDE BACKGROUND (THIS FIXES WHITE ISSUE) */
+.authFormWrapper {
+  min-height: 100vh;               /* 🔴 VERY IMPORTANT */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: linear-gradient(
+    135deg,
+    #020617,
+    #0f172a
+  );
+}
+
+/* GLASS CARD */
+.authBox {
+  width: 100%;
+  max-width: 420px;
+  padding: 40px;
+
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(14px);
+
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+
+  color: white;
+}
+
+/* INPUT FIX */
+.authBox .MuiInputBase-root {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+}
+
+.authBox input {
+  color: white;
+}
+
+.authBox label {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* BUTTON FIX */
+.authBox button {
+  background-color: #ff9839;
+  font-weight: 600;
+}
+
+.authBox button:hover {
+  background-color: #e8872f;
+}
+/* ===== LOGIN / REGISTER TOGGLE FIX ===== */
+
+.authToggle {
+  display: flex;
+  gap: 16px;              /* ⭐ THIS CREATES SPACE */
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.authToggle button {
+  flex: 1;                /* Equal width buttons */
+  border-radius: 999px;   /* Modern pill shape */
+  font-weight: 600;
+}
+
+/* ================= FULLSCREEN AUTH PAGE ================= */
+
+.authPage {
+  min-height: 100vh;
+  background:
+    linear-gradient(
+      rgba(15, 23, 42, 0.9),
+      rgba(15, 23, 42, 0.9)
+    ),
+    url("https://images.unsplash.com/photo-1522071820081-009f0129c71c");
+  background-size: cover;
+  background-position: center;
+}
+
+.authFormWrapper {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.authBox {
+  width: 100%;
+  max-width: 420px;
+  padding: 40px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(14px);
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  color: white;
+}
+
+.authAvatar {
+  margin-bottom: 12px;
+  background-color: #ff9839;
+}
+
+.authToggle {
+  display: flex;
+  gap: 16px;
+  margin: 16px 0;
+}
+
+.authBox .MuiInputBase-root {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+}
+
+.authBox input {
+  color: white;
+}
+
+.authBox label {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.authBox button {
+  font-weight: 600;
+}
+
+/* ================= HOME PAGE ================= */
+
+.homePage {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #020617, #0f172a);
+  color: white;
+}
+
+/* NAVBAR */
+.homeNavbar {
+  height: 64px;
+  padding: 0 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+}
+
+.homeNavActions svg {
+  color: white;
+}
+
+/* MAIN CENTER AREA */
+.homeContainer {
+  min-height: calc(100vh - 64px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* CARD */
+.homeCard {
+  width: 100%;
+  max-width: 420px;
+  padding: 40px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(14px);
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  text-align: center;
+}
+
+/* ICON */
+.homeIcon {
+  font-size: 48px;
+  color: #ff9839;
+  margin-bottom: 12px;
+}
+
+/* JOIN BOX */
+.homeJoinBox {
+  margin-top: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* INPUT */
+.homeCard .MuiInputBase-root {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+}
+
+.homeCard input {
+  color: white;
+}
+
+.homeCard label {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* BUTTON */
+.homeCard button {
+  font-weight: 600;
+}

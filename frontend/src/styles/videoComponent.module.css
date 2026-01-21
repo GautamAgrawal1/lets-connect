@@ -1,0 +1,120 @@
+/* ================= MEETING ROOM ================= */
+
+.meetVideoContainer {
+    position: relative;
+    height: 100vh;
+    width: 100vw;
+    background: radial-gradient(circle at top, #0f172a, #020617);
+    overflow: hidden;
+  }
+  
+  /* ================= REMOTE VIDEO ================= */
+  
+  .conferenceView {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+  }
+  
+  .conferenceView video {
+    width: 85vw;
+    max-width: 1200px;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: 20px;
+    background: black;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+  
+    /* 🔑 CRITICAL FIX */
+    pointer-events: none;
+  }
+  
+  /* ================= LOCAL VIDEO ================= */
+  
+  .meetUserVideo {
+    position: absolute;
+    bottom: 90px;
+    right: 30px;
+    width: 260px;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: 16px;
+    background: black;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    border: 2px solid rgba(255, 255, 255, 0.15);
+  
+    /* 🔑 CRITICAL FIX */
+    pointer-events: none;
+    z-index: 5;
+  }
+  
+  /* ================= CONTROLS ================= */
+  
+  .buttonContainers {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 18px;
+    padding: 14px 26px;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(14px);
+    border-radius: 40px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  
+    /* 🔑 ABOVE VIDEO */
+    z-index: 10;
+  }
+  
+  .buttonContainers svg {
+    font-size: 1.9rem;
+  }
+  
+  /* ================= CHAT PANEL ================= */
+  
+  .chatRoom {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: 320px;
+    background: hsl(44, 31%, 49%);
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 20;
+  }
+  
+  .chatContainer {
+    height: 100%;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .chattingDisplay {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 12px;
+  }
+  
+  /* ================= RESPONSIVE ================= */
+  
+  @media (max-width: 768px) {
+    .conferenceView video {
+      width: 95vw;
+    }
+  
+    .meetUserVideo {
+      width: 180px;
+      right: 10px;
+      bottom: 110px;
+    }
+  
+    .chatRoom {
+      width: 100vw;
+    }
+  }
+  
