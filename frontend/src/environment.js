@@ -1,5 +1,6 @@
 const server =
-  process.env.REACT_APP_SOCKET_URL ||
-  "http://localhost:8000";
+  window.location.hostname === "localhost"
+    ? "http://localhost:8000"
+    : "https://lets-connect-1-1oy1.onrender.com";
 
 export default server;
