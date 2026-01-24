@@ -54,7 +54,10 @@ export default function VideoMeet() {
   /* ================= SOCKET ================= */
 
   const initSocket = () => {
-    socketRef.current = io(server);
+    socketRef.current = io(server, {
+        transports: ["websocket"],
+        secure: true
+      });
 
     socketRef.current.on("connect", () => {
       socketRef.current.emit("join-call", window.location.pathname);
