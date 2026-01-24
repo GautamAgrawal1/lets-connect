@@ -4,7 +4,7 @@ import {
   IconButton,
   Badge,
   TextField,
-  Button
+  Button,
 } from "@mui/material";
 
 import VideocamIcon from "@mui/icons-material/Videocam";
@@ -19,119 +19,81 @@ import ChatIcon from "@mui/icons-material/Chat";
 import styles from "../styles/videoComponent.module.css";
 import server from "../environment";
 
-const peerConfig = {
+const ICE_CONFIG = {
   iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
 };
 
-let connections = {};
+const connections = {};
 
 export default function VideoMeet() {
-  const socketRef = useRef();
-  const socketIdRef = useRef();
-  const localVideoRef = useRef();
-  const videoRef = useRef([]);
+  const socketRef = useRef(null);
+  const localVideoRef = useRef(null);
+  const localStreamRef = useRef(null);
 
-  const [videos, setVideos] = useState([]);
+  const [remoteStreams, setRemoteStreams] = useState([]);
+  const [joined, setJoined] = useState(false);
+
   const [videoOn, setVideoOn] = useState(true);
   const [audioOn, setAudioOn] = useState(true);
   const [screenOn, setScreenOn] = useState(false);
 
-  const [chatOpen, setChatOpen] = useState(false);
-  const [messages, setMessages] = useState([]);
-  const [message, setMessage] = useState("");
-  const [newMessages, setNewMessages] = useState(0);
-
   const [username, setUsername] = useState("");
-  const [joined, setJoined] = useState(false);
 
   /* ================= MEDIA ================= */
 
-  const getUserMedia = async () => {
+  const initMedia = async () => {
     const stream = await navigator.mediaDevices.getUserMedia({
-      video: videoOn,
-      audio: audioOn,
-    });
-
-    window.localStream = stream;
-    localVideoRef.current.srcObject = stream;
-  };
-
-  const startScreenShare = async () => {
-    const screenStream = await navigator.mediaDevices.getDisplayMedia({
       video: true,
+      audio: true,
     });
 
-    const screenTrack = screenStream.getVideoTracks()[0];
-
-    Object.values(connections).forEach((pc) => {
-      const sender = pc
-        .getSenders()
-        .find((s) => s.track.kind === "video");
-      sender.replaceTrack(screenTrack);
-    });
-
-    screenTrack.onended = () => stopScreenShare();
-    setScreenOn(true);
-  };
-
-  const stopScreenShare = () => {
-    const cameraTrack = window.localStream
-      .getVideoTracks()[0];
-
-    Object.values(connections).forEach((pc) => {
-      const sender = pc
-        .getSenders()
-        .find((s) => s.track.kind === "video");
-      sender.replaceTrack(cameraTrack);
-    });
-
-    setScreenOn(false);
+    localStreamRef.current = stream;
+    localVideoRef.current.srcObject = stream;
   };
 
   /* ================= SOCKET ================= */
 
-  const connectSocket = () => {
+  const initSocket = () => {
     socketRef.current = io(server);
 
     socketRef.current.on("connect", () => {
-      socketIdRef.current = socketRef.current.id;
-      socketRef.current.emit("join-call", window.location.href);
+      socketRef.current.emit("join-call", window.location.pathname);
     });
-
-    socketRef.current.on("signal", handleSignal);
-    socketRef.current.on("user-left", removeUser);
-    socketRef.current.on("chat-message", addMessage);
 
     socketRef.current.on("user-joined", (id, clients) => {
       clients.forEach((clientId) => {
-        if (clientId === socketIdRef.current) return;
-        createPeer(clientId);
+        if (!connections[clientId] && clientId !== socketRef.current.id) {
+          createPeer(clientId);
+        }
       });
     });
+
+    socketRef.current.on("signal", handleSignal);
+    socketRef.current.on("user-left", handleUserLeft);
   };
 
-  const createPeer = (socketId) => {
-    const pc = new RTCPeerConnection(peerConfig);
-    connections[socketId] = pc;
+  const createPeer = (peerId) => {
+    const pc = new RTCPeerConnection(ICE_CONFIG);
+    connections[peerId] = pc;
 
-    window.localStream.getTracks().forEach((track) => {
-      pc.addTrack(track, window.localStream);
+    localStreamRef.current.getTracks().forEach((track) => {
+      pc.addTrack(track, localStreamRef.current);
     });
 
     pc.onicecandidate = (e) => {
       if (e.candidate) {
         socketRef.current.emit(
           "signal",
-          socketId,
+          peerId,
           JSON.stringify({ ice: e.candidate })
         );
       }
     };
 
     pc.ontrack = (e) => {
-      setVideos((prev) => {
-        if (prev.find((v) => v.socketId === socketId)) return prev;
-        return [...prev, { socketId, stream: e.streams[0] }];
+      setRemoteStreams((prev) => {
+        if (prev.find((s) => s.id === peerId)) return prev;
+        return [...prev, { id: peerId, stream: e.streams[0] }];
       });
     };
 
@@ -139,19 +101,21 @@ export default function VideoMeet() {
       pc.setLocalDescription(offer);
       socketRef.current.emit(
         "signal",
-        socketId,
+        peerId,
         JSON.stringify({ sdp: offer })
       );
     });
   };
 
   const handleSignal = async (fromId, message) => {
-    const signal = JSON.parse(message);
+    const data = JSON.parse(message);
     const pc = connections[fromId];
 
-    if (signal.sdp) {
-      await pc.setRemoteDescription(signal.sdp);
-      if (signal.sdp.type === "offer") {
+    if (!pc) return;
+
+    if (data.sdp) {
+      await pc.setRemoteDescription(data.sdp);
+      if (data.sdp.type === "offer") {
         const answer = await pc.createAnswer();
         await pc.setLocalDescription(answer);
         socketRef.current.emit(
@@ -162,36 +126,22 @@ export default function VideoMeet() {
       }
     }
 
-    if (signal.ice) {
-      await pc.addIceCandidate(signal.ice);
+    if (data.ice) {
+      await pc.addIceCandidate(data.ice);
     }
   };
 
-  const removeUser = (id) => {
-    setVideos((prev) => prev.filter((v) => v.socketId !== id));
+  const handleUserLeft = (id) => {
     if (connections[id]) connections[id].close();
     delete connections[id];
-  };
-
-  /* ================= CHAT ================= */
-
-  const sendMessage = () => {
-    socketRef.current.emit("chat-message", message, username);
-    setMessage("");
-  };
-
-  const addMessage = (data, sender, senderId) => {
-    setMessages((prev) => [...prev, { sender, data }]);
-    if (senderId !== socketIdRef.current) {
-      setNewMessages((n) => n + 1);
-    }
+    setRemoteStreams((prev) => prev.filter((s) => s.id !== id));
   };
 
   /* ================= JOIN ================= */
 
   const joinMeeting = async () => {
-    await getUserMedia();
-    connectSocket();
+    await initMedia();     // 🔥 FIRST
+    initSocket();          // 🔥 SECOND
     setJoined(true);
   };
 
@@ -208,17 +158,17 @@ export default function VideoMeet() {
             onChange={(e) => setUsername(e.target.value)}
           />
           <Button onClick={joinMeeting}>Join</Button>
-          <video ref={localVideoRef} autoPlay muted />
+          <video ref={localVideoRef} autoPlay muted playsInline />
         </div>
       ) : (
         <div className={styles.meetVideoContainer}>
           <div className={styles.conferenceView}>
-            {videos.map((v) => (
+            {remoteStreams.map((r) => (
               <video
-                key={v.socketId}
+                key={r.id}
                 autoPlay
                 playsInline
-                ref={(ref) => ref && (ref.srcObject = v.stream)}
+                ref={(el) => el && (el.srcObject = r.stream)}
               />
             ))}
           </div>
@@ -228,6 +178,7 @@ export default function VideoMeet() {
             ref={localVideoRef}
             autoPlay
             muted
+            playsInline
           />
 
           <div className={styles.buttonContainers}>
@@ -239,39 +190,14 @@ export default function VideoMeet() {
               {audioOn ? <MicIcon /> : <MicOffIcon />}
             </IconButton>
 
-            <IconButton
-              onClick={screenOn ? stopScreenShare : startScreenShare}
-            >
-              {screenOn ? <StopScreenShareIcon /> : <ScreenShareIcon />}
-            </IconButton>
-
             <IconButton onClick={() => window.location.reload()}>
               <CallEndIcon />
             </IconButton>
 
-            <Badge badgeContent={newMessages}>
-              <IconButton onClick={() => setChatOpen(!chatOpen)}>
-                <ChatIcon />
-              </IconButton>
-            </Badge>
+            <IconButton>
+              <ChatIcon />
+            </IconButton>
           </div>
-
-          {chatOpen && (
-            <div className={styles.chatRoom}>
-              <div>
-                {messages.map((m, i) => (
-                  <p key={i}>
-                    <b>{m.sender}:</b> {m.data}
-                  </p>
-                ))}
-              </div>
-              <TextField
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-              />
-              <Button onClick={sendMessage}>Send</Button>
-            </div>
-          )}
         </div>
       )}
     </div>
